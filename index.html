@@ -5,19 +5,139 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>L-System Visualizer</title>
   <style>
-    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background: #0b0b0f; color: #eaeaf0; }
-    header { padding: 12px 16px; border-bottom: 1px solid #232335; }
-    main { height: calc(100vh - 49px); }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background: #0b0b0f;
+      color: #eaeaf0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 10px 14px;
+      border-bottom: 1px solid #232335;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 14px;
+      align-items: center;
+    }
+    .brand { display: flex; align-items: baseline; gap: 10px; }
+    .brand span { opacity: .7; font-size: 12px; }
+    .controls { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+    .control { display: flex; gap: 6px; align-items: center; }
+    label { font-size: 12px; opacity: .85; }
+    input[type="number"], input[type="text"], textarea {
+      background: #141423;
+      color: #eaeaf0;
+      border: 1px solid #2b2b44;
+      border-radius: 8px;
+      padding: 6px 8px;
+      outline: none;
+    }
+    input[type="range"] { width: 140px; }
+    button {
+      background: #1f1f33;
+      color: #eaeaf0;
+      border: 1px solid #2b2b44;
+      border-radius: 10px;
+      padding: 7px 10px;
+      cursor: pointer;
+    }
+    button:hover { filter: brightness(1.12); }
+    button:active { transform: translateY(1px); }
+    .status { font-size: 12px; opacity: .8; }
+    .status.error { color: #ff7b7b; opacity: 1; }
+
+    main { flex: 1; display: grid; grid-template-columns: 360px 1fr; min-height: 0; }
+    aside {
+      border-right: 1px solid #232335;
+      padding: 12px;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    textarea {
+      width: 100%;
+      height: 220px;
+      resize: vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+    }
+    .hint { font-size: 12px; opacity: .7; line-height: 1.4; }
+    .canvasWrap { min-width: 0; min-height: 0; }
     canvas { width: 100%; height: 100%; display: block; background: #000; }
+
+    @media (max-width: 900px) {
+      main { grid-template-columns: 1fr; }
+      aside { border-right: none; border-bottom: 1px solid #232335; }
+    }
   </style>
 </head>
 <body>
   <header>
-    <strong>L-System Visualizer</strong> <span style="opacity:.7">— scaffold</span>
+    <div class="brand">
+      <strong>L-System Visualizer</strong>
+      <span>— demo</span>
+    </div>
+
+    <div class="controls" role="group" aria-label="L-system controls">
+      <div class="control">
+        <label for="axiom">Axiom</label>
+        <input id="axiom" type="text" value="B" size="2" />
+      </div>
+
+      <div class="control">
+        <label for="iters">Iterations</label>
+        <input id="iters" type="range" min="0" max="6" step="1" value="2" />
+        <span id="itersVal" class="status">2</span>
+      </div>
+
+      <div class="control">
+        <label for="angle">Angle°</label>
+        <input id="angle" type="number" min="0" max="180" step="1" value="25" style="width:78px" />
+      </div>
+
+      <div class="control">
+        <label for="step">Step</label>
+        <input id="step" type="number" min="1" max="40" step="1" value="8" style="width:70px" />
+      </div>
+
+      <button id="btnRender" type="button">Render</button>
+      <button id="btnGrow" type="button">Grow</button>
+      <button id="btnStop" type="button">Stop</button>
+      <span id="status" class="status"></span>
+    </div>
   </header>
+
   <main>
-    <canvas id="canvas"></canvas>
+    <aside>
+      <div>
+        <label for="rules">Rules (one per line, e.g. A=AB)</label>
+        <textarea id="rules" spellcheck="false">A=AA
+B=A+[-B]-A[-B]+A[-B]+B</textarea>
+      </div>
+
+      <div class="hint">
+        Tips:
+        <ul style="margin:6px 0 0 18px; padding:0;">
+          <li><code>A/B/F</code>: draw forward</li>
+          <li><code>+</code>/<code>-</code>: turn</li>
+          <li><code>[</code>/<code>]</code>: branch (push/pop state)</li>
+          <li>Try Iterations 3–5 (it grows fast!).</li>
+        </ul>
+      </div>
+
+      <div class="hint" id="stats"></div>
+    </aside>
+
+    <div class="canvasWrap">
+      <canvas id="canvas"></canvas>
+    </div>
   </main>
+
   <script src="./src/app.js"></script>
 </body>
 </html>
+
